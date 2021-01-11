@@ -1,15 +1,23 @@
-package com.jamieswhiteshirt.trumpetskeleton.entities.goals;
+package com.eli.trumpetskeleton.entity.goal;
 
-import com.jamieswhiteshirt.trumpetskeleton.register.Items;
+import com.eli.trumpetskeleton.TrumpetRegistry;
+import com.eli.trumpetskeleton.entity.TrumpetSkeletonEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.RangedAttackGoal;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.util.SoundEvent;
 
 import java.util.EnumSet;
+import java.util.function.Supplier;
 
-public class TrumpetAttackGoal<T extends MonsterEntity> extends Goal {
-    private final T actor;
+
+
+public class TrumpetAttackGoal extends Goal {
+
+    private final MonsterEntity actor;
     private final double speed;
     private final float squaredRange;
     private int attackInterval;
@@ -19,17 +27,19 @@ public class TrumpetAttackGoal<T extends MonsterEntity> extends Goal {
     private boolean strafeBack;
     private int strafeChangeTimer = -1;
 
-    public TrumpetAttackGoal(T actor, double speed, int attackInterval, float range) {
-        this.actor = actor;
+    public final Supplier<SoundEvent> sound;
+
+    public TrumpetAttackGoal(TrumpetSkeletonEntity creature, double speed, int attackInterval, float range, Supplier<SoundEvent> sound) {
+        super();
+        this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+        this.actor = creature;
+        this.sound = sound;
+
         this.speed = speed;
         this.attackInterval = attackInterval;
         this.squaredRange = range * range;
 
         this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
-    }
-
-    public void setAttackInterval(int attackInterval) {
-        this.attackInterval = attackInterval;
     }
 
     @Override
@@ -38,7 +48,7 @@ public class TrumpetAttackGoal<T extends MonsterEntity> extends Goal {
     }
 
     protected boolean isHoldingTrumpet() {
-        return actor.isHolding(Items.TRUMPET_ITEM.get());
+        return actor.getItemStackFromSlot(EquipmentSlotType.MAINHAND).getItem().equals(TrumpetRegistry.TRUMPET_ITEM.get());
     }
 
     @Override
@@ -49,7 +59,6 @@ public class TrumpetAttackGoal<T extends MonsterEntity> extends Goal {
     @Override
     public void startExecuting() {
         super.startExecuting();
-
         actor.setAggroed(true);
     }
 
@@ -120,7 +129,7 @@ public class TrumpetAttackGoal<T extends MonsterEntity> extends Goal {
                 actor.resetActiveHand();
             }
         } else if (--cooldown <= 0 && seeCounter >= -60) {
-            actor.setActiveHand(ProjectileHelper.getHandWith(actor, Items.TRUMPET_ITEM.get()));
+            actor.setActiveHand(ProjectileHelper.getHandWith(actor, TrumpetRegistry.TRUMPET_ITEM.get()));
             cooldown = actor.world.rand.nextInt(attackInterval);
         }
     }

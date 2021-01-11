@@ -1,6 +1,7 @@
-package com.jamieswhiteshirt.trumpetskeleton.items;
+package com.eli.trumpetskeleton.item;
 
-import com.jamieswhiteshirt.trumpetskeleton.register.SoundEvents;
+import com.eli.trumpetskeleton.TrumpetRegistry;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -11,6 +12,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.world.World;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 public class TrumpetItem extends Item {
@@ -46,16 +48,22 @@ public class TrumpetItem extends Item {
     }
 
     @Override
+    @ParametersAreNonnullByDefault
+    @MethodsReturnNonnullByDefault
     public UseAction getUseAction(ItemStack stack) {
         return UseAction.DRINK;
     }
 
     @Override
+    @ParametersAreNonnullByDefault
+    @MethodsReturnNonnullByDefault
     public int getUseDuration(ItemStack stack) {
         return 55;
     }
 
     @Override
+    @ParametersAreNonnullByDefault
+    @MethodsReturnNonnullByDefault
     public SoundEvent getDrinkSound() {
         return null;
     }
@@ -67,7 +75,7 @@ public class TrumpetItem extends Item {
         int useTime = getUseDuration(stack) - count;
 
         if (useTime == 10) {
-            player.playSound(SoundEvents.TRUMPET_DOOT.get(), 1, 0.9F + player.world.rand.nextFloat() * 0.2F);
+            player.playSound(TrumpetRegistry.TRUMPET_DOOT.get(), 1, 0.9F + player.world.rand.nextFloat() * 0.2F);
             TrumpetItem.scare(player.world, player);
             stack.damageItem(1, player, (entity) -> entity.sendBreakAnimation(entity.getActiveHand()));
         } else if (useTime >= 15) {
@@ -76,6 +84,8 @@ public class TrumpetItem extends Item {
     }
 
     @Override
+    @ParametersAreNonnullByDefault
+    @MethodsReturnNonnullByDefault
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
         playerIn.setActiveHand(handIn);
         return ActionResult.resultSuccess(playerIn.getHeldItem(handIn));
